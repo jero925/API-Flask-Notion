@@ -1,5 +1,6 @@
+"""Estructuras de las db"""
 cuota_db = {
-    "Monto total": {
+    "Monto Total": {
         "number": 1
     },
     "Cantidad de cuotas": {
@@ -19,6 +20,10 @@ cuota_db = {
         "date": {
             "start": "2024-03-13"
         }
+    },
+    "Meses": {
+        "type": "relation",
+        "relation": []
     },
     "Name": {
         "title": [
