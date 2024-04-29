@@ -1,31 +1,44 @@
-import math
+# import math
 
-print(math.sqrt(25))
+# print(math.sqrt(25))
 
-print("hola mundo")
+# print("hola mundo")
 
-letra = "pepe"
-edad = 20
+# LETRA = "pepe"
+# EDAD = 20
 
-def saludar(nombre):
-    print("saludos, " + nombre + "!")
+# def saludar(nombrePersona):
+#     print("saludos, " + nombrePersona + "!")
 
-saludar("Pepe")
+# saludar("Pepe")
 
-if edad > 18:
-    print("mayor de edad")
-else:
-    print("Menor")
+# if EDAD > 18:
+#     print("mayor de EDAD")
+# else:
+#     print("Menor")
 
-## for, while
+# ## for, while
     
-for i in range(5):
-    print(i)
+# for i in range(5):
+#     print(i)
 
-while edad < 30:
-    print("muy pibardo")
-    edad += 1
+# while EDAD < 30:
+#     print("muy pibardo")
+#     EDAD += 1
 
-#Input 
-nombre = input("Ingresa nombre papurrix: ")
-saludar(nombre)
+# nombre = input("Ingresa nombre papurrix: ")
+# saludar(nombre)
+
+def imprimir_numeros_pares_hasta_n(n):
+    """"
+    Imprime todos los numeros pares desde 0 hasta el numero n (incluido)
+    """
+    for i in range (n + 1):
+        if i % 2 == 0:
+            print(i)
+        else:
+            print(f"{i} (Impar)")
+
+#Usar la funcion
+LIMITE = 10
+imprimir_numeros_pares_hasta_n(LIMITE)
