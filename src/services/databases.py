@@ -1,12 +1,9 @@
 """Obtiene una db específica"""
+import os
+
 from notion_client import Client
 
-from .valorizar_venv import apiKeyNotion, dbCuotas
-
-from ..database.db_properties import cuota_props
-
-from ..database.db_structures import cuota_db
-
+apiKeyNotion = os.getenv("NOTION_SECRET")
 # Inicializa el cliente de Notion
 notion = Client(auth=apiKeyNotion)
 
@@ -22,40 +19,6 @@ def get_database(database_id: str) -> dict:
     """
     response = notion.databases.retrieve(database_id=database_id)
     return response
-
-def query_database(database_id: str, filters=None) -> dict:
-    """
-    Consulta una base de datos con filtros opcionales.
-
-    Args:
-        database_id (str): El ID de la base de datos que se desea consultar.
-        filters (dict, opcional): Filtros que se aplicarán a la consulta.
-
-    Returns:
-        list: Una lista de registros que coinciden con la consulta.
-    """
-    query_params = {"database_id": database_id}
-    if filters is not None:
-        query_params["filter"] = filters
-
-    response = notion.databases.query(**query_params)
-    results = response["results"]
-    return results
-
-def get_names_db(database_id: str, filters=None) -> list:
-    """
-    Recupera nombres de una base de datos.
-
-    Args:
-        database_id (str): El ID de la base de datos de la que se desean recuperar los nombres.
-        filters (dict, opcional): Filtros que se aplicarán a la consulta.
-
-    Returns:
-        list: Una lista de nombres de la base de datos especificada.
-    """
-    results = query_database(database_id, filters)
-    nombres = [result["properties"]["Name"]["title"][0]["plain_text"] for result in results]
-    return nombres
 
 def get_property_data_type(properties: dict, prop: str) -> list:
     """
@@ -104,8 +67,8 @@ def create_page(database_id: str, props_page: dict, props_modified: dict) -> dic
                 case "date":
                     props_page[page_key]["date"]["start"] = mod_value
                 case "relation":
-                    for relacion in mod_value:
-                        props_page[page_key]["relation"].append({"id": relacion})
+                    for relation in mod_value:
+                        props_page[page_key]["relation"].append({"id": relation})
 
     # Construye las propiedades de la página, el padre y el ícono para crear la página
     page_properties = props_page
@@ -115,7 +78,4 @@ def create_page(database_id: str, props_page: dict, props_modified: dict) -> dic
     # Crea la página en Notion y devuelve la respuesta
     new_page = notion.pages.create(parent=page_parent, icon=page_icon, properties=page_properties)
     print(new_page)
-    # return new_page
-
-cuota_props_dict = cuota_props.to_dict()
-create_page(dbCuotas, cuota_db, cuota_props_dict)
+    return new_page
