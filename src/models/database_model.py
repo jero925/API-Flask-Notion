@@ -24,9 +24,8 @@ class Database():
         name (str): El nombre de la base de datos.
     """
 
-    def __init__(self, database_id: str, name: str) -> None:
+    def __init__(self, database_id: str) -> None:
         self.database_id: str = database_id
-        self.name: str = name
         self.properties = {}
 
     def query_database(self, database_id: str, filters: dict = None) -> dict:
@@ -61,11 +60,12 @@ class Database():
             list: Lista de nombres de los registros que coinciden con la consulta.
         """
         results: dict = self.query_database(self.database_id, filters)
+        title_name = self.get_database_title_property()
         rows_titles = []
         for result in results:
             row_dict = {
                 "id": result["id"],
-                "nombre": result["properties"]["Name"]["title"][0]["plain_text"]
+                "nombre": result["properties"][title_name]["title"][0]["plain_text"]
             }
             rows_titles.append(row_dict)
 
@@ -80,11 +80,23 @@ class Database():
             prop (str): El nombre de la propiedad.
 
         Returns:
-            str: El tipo de datos de la propiedad especificada.
+            data_type: El tipo de datos de la propiedad especificada.
         """
         data_type: list[str] = list(properties[prop].keys())[-1]
 
         return data_type
+
+    def get_database_title_property(self) -> str:
+        """
+        Obtiene el nombre de la propiedad que es un título en la base de datos.
+
+        Returns:
+            str: El nombre de la propiedad que es un título, o una cadena vacía si no se encuentra.
+        """
+        for prop_name, prop_details in self.properties.items():
+            if "title" in prop_details:
+                return prop_name
+        return None
 
     def get_page_by_id(self, page_id: str) -> dict:
         """
@@ -159,55 +171,15 @@ class Database():
         return new_page
 
 
-class Cuota(Database):
-    """
-    Inicializa una instancia de Cuota.
-    """
-
-    def __init__(self) -> None:
-        self.database_id: str = os.getenv("CUOTAS_DB_ID")
-        super().__init__(database_id=self.database_id, name="Cuota")
-        self.icon: str = "https://www.notion.so/icons/credit-card_gray.svg"
-        self.properties: dict = {
-            "Monto Total": {
-                "number": 1
-            },
-            "Cantidad de cuotas": {
-                "select": {
-                    "name": "6"  # requerido
-                }
-            },
-            "Monto Regalado": {
-                "number": 0
-            },
-            "Primer cuota": {
-                "date": {
-                    "start": "2024-02-13"
-                }
-            },
-            "Fecha de compra": {
-                "date": {
-                    "start": "2024-03-13"
-                }
-            },
-            "Meses": {
-                "type": "relation",
-                "relation": []
-            },
-            "Name": {
-                "title": [
-                    {
-                        "text": {
-                            "content": "NombreDelRegistro"
-                        }
-                    }
-                ]
-            }
-        }
+class SpecificDatabase(Database):
+    """Instacia de subclase para una Database especifica"""
+    def __init__(self, database_id: str) -> None:
+        self.icon: str = ""
+        super().__init__(database_id)
 
     def create_page(self, props_modified: dict) -> dict:
         """
-        Crea una nueva página en la base de datos con las propiedades modificadas.
+        Crea una nueva página en la base de datos Cuota con las propiedades modificadas.
 
         Args:
             props_modified (dict): Diccionario de propiedades modificadas.
@@ -222,66 +194,95 @@ class Cuota(Database):
             props_modified=props_modified
         )
 
+    def query_specific_database(self, filters: dict = None) -> dict:
+        print(self.database_id)
+        print(filters)
+        return super().query_database(database_id=self.database_id,filters=filters)
 
-def create_cuota_page(database: Database) -> None:
-    """Ejemplo de creacion de pagina en DB Cuotas"""
-    cuota_props: dict = {
-        "Monto Total": {
-            "number": 1
-        },
-        "Cantidad de cuotas": {
-            "select": {
-                "name": "6"  # requerido
-            }
-        },
-        "Monto Regalado": {
-            "number": 0
-        },
-        "Primer cuota": {
-            "date": {
-                "start": "2024-02-13"
-            }
-        },
-        "Fecha de compra": {
-            "date": {
-                "start": "2024-03-13"
-            }
-        },
-        "Meses": {
-            "type": "relation",
-            "relation": []
-        },
-        "Name": {
-            "title": [
-                {
-                    "text": {
-                        "content": "NombreDelRegistro"
-                    }
+class FlujoPlata(Database):
+    """
+    Inicializa una instancia de Flujo de Plata.
+    """
+    def __init__(self) -> None:
+        self.database_id: str = os.getenv("FLUJOPLATA_DB_ID")
+        super().__init__(database_id=self.database_id)
+        self.icon: str = ""
+        self.properties: dict = {
+            "Fecha": {
+                "type": "date",
+                "date": {
+                        "start": "2024-01-04"
                 }
-            ]
+            },
+            "Producto en cuotas": {
+                "type": "relation",
+                "relation": [],
+            },
+            "Cuenta": {
+                "type": "relation",
+                "relation": [],
+            },
+            "Tipo": {
+                "type": "multi_select",
+                "multi_select": []
+            },
+            "Suscripcion": {
+                "type": "relation",
+                "relation": [],
+            },
+            "I/O": {
+                "type": "select",
+                "select": {
+                        "name": "Gasto"
+                }
+            },
+            "Estado Suscripcion": {
+                "type": "status",
+                "status": {
+                        "name": "No sub"
+                }
+            },
+            "Ingreso. Mes Año": {
+                "type": "relation",
+                "relation": [],
+            },
+            "Monto": {
+                "type": "number",
+                "number": 1
+            },
+            "Gasto. Mes Año": {
+                "type": "relation",
+                "relation": [],
+            },
+            "Nombre": {
+                "id": "title",
+                "type": "title",
+                "title": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": ""
+                            }
+                        }
+                ]
+            }
         }
-    }
 
-    cuota_props_modified: dict = {
-        "icon": "https://www.notion.so/icons/credit-card_gray.svg",
-        "parent": "",
-        "Name": "Prueba ejecucion de cosas",
-        "Monto Total": 999999,
-        "Cantidad de cuotas": "12",
-        "Primer cuota": "2024-11-15",
-        "Fecha de compra": "2024-07-29",
-        "Meses": ["d9c435da42a445b48ceaf181a5615380",
-                  "6479ae15-e5c1-46b6-bf8a-d41918bcb071",
-                  "8c3a3aa1-5bb2-43a4-bb28-2f9e4e986feb"]
-    }
+    def create_page(self, props_modified: dict) -> dict:
+        """
+        Crea una nueva página en la base de datos Cuota con las propiedades modificadas.
 
-    # cuota_props_dict: dict = cuota_props_modified.to_dict
-    # print(cuota_props_modified)
-    database.create_page(
-        database_id=database.database_id,
-        props_page=cuota_props,
-        props_modified=cuota_props_modified)
+        Args:
+            props_modified (dict): Diccionario de propiedades modificadas.
 
+        Returns:
+            dict: Retorna un diccionario representando la página creada.
+        """
+        return super().create_page(
+            database_id=self.database_id,
+            props_page=self.properties,
+            props_modified=props_modified
+        )
 
 def create_flujo_plata_page(database: Database):
     """Ejemplo de creacion de pagina en DB Flujo Plata"""
@@ -362,7 +363,8 @@ def create_flujo_plata_page(database: Database):
     database.create_page(
         database_id=database.database_id,
         props_page=flujo_plata_props,
-        props_modified=flujo_plata_props_modified)
+        props_modified=flujo_plata_props_modified
+    )
 
 
 def main() -> None:
@@ -373,22 +375,11 @@ def main() -> None:
     database_id: str = os.getenv("CUOTAS_DB_ID")
 
     # Crear una instancia de la clase Database
-    db: Database = Database(database_id=database_id, name="nombre")
-
-    filtros: dict = {
-        "and": [
-            {
-                "property": "Activa",
-                "checkbox": {
-                    "equals": True
-                }
-            }
-        ]
-    }
+    db: Database = Database(database_id=database_id)
     # query_database_results = db.query_database(filters=filtros)
     # print(query_database_results)
 
-    names_rows_results: dict = db.get_titles_rows_db(filters=filtros)
+    names_rows_results: dict = db.get_titles_rows_db()
     print(names_rows_results)
 
     # create_cuota_page(database=db)
