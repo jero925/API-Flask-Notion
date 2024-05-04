@@ -1,7 +1,8 @@
 """Rutas de mi aplicacion"""
-import os
 from flask import Flask, jsonify, request
-from models.database_model import Database, Cuota
+from src.models.database_model import FlujoPlata
+from src.models.cuotas import Cuota
+from src.models.meses import Meses
 
 app = Flask(__name__)
 
@@ -15,11 +16,10 @@ def index():
 
 
 @app.route('/cuotas')
-def get_cuotas():
+def get_cuotas() -> dict:
     """Obtiene cuotas activas"""
     try:
-        database_cuota: Database = Database(
-            database_id=os.getenv("CUOTAS_DB_ID"), name="Cuota")
+        database_cuota: Cuota = Cuota()
         active_filter: dict = {
             "and": [
                 {
@@ -30,19 +30,17 @@ def get_cuotas():
                 }
             ]
         }
-        active_dues: list = database_cuota.get_names_rows_db(
-            filters=active_filter)
-        return jsonify({'dues': active_dues, 'message': "Active Dues."})
+        active_dues: list = database_cuota.get_titles_rows_db(filters=active_filter)
+        return jsonify({'month': active_dues, 'message': "Active Dues."})
     except Exception as ex:
         return jsonify({'message': f"Error: {ex}"})
 
 
 @app.route('/cuotas/<id>')
-def get_cuota_by_id(id: str) -> None:
+def get_cuota_by_id(id: str) -> dict:
     """Obtiene una cuota específica"""
     try:
-        database_cuota: Database = Database(
-            database_id=os.getenv("CUOTAS_DB_ID"), name="Cuota")
+        database_cuota: Cuota = Cuota()
 
         page_cuota_data = database_cuota.get_page_by_id(id)
         if page_cuota_data is not None:
@@ -52,11 +50,21 @@ def get_cuota_by_id(id: str) -> None:
     except Exception as ex:
         return jsonify({'message': f"Error: {ex}"})
 
+@app.route('/meses')
+def get_mes_actual() -> dict:
+    """Obtiene el mes actual"""
+    try:
+        database_meses = Meses()
+        page_mes_actual: dict = database_meses.get_actual_month()
+        if page_mes_actual is not None:
+            return jsonify({'month': page_mes_actual, 'message': "Mes actual."})
+    except Exception as ex:
+        return jsonify({'message': f"Error: {ex}"})
+
 # POST
 
-
 @app.route('/cuota', methods=["POST"])
-def add_new_due_product() -> None:
+def add_new_due_product() -> dict:
     """
     Agrega un nuevo producto en cuotas a la base de datos.
 
@@ -77,11 +85,41 @@ def add_new_due_product() -> None:
             "Fecha de compra": request.json["fecha de compra"],
             "Meses": request.json["meses"]
         }
+
         database_cuota.create_page(props_modified=cuota_props_body)
         return jsonify({'message': "Producto en cuotas agregado."})
     except Exception as ex:
         return jsonify({'message': f"Error al registrar nueva cuota. \n {ex}"})
 
+
+@app.route('/movimiento', methods=["POST"])
+def add_new_transaction() -> None:
+    """
+    Agrega un nuevo producto en cuotas a la base de datos.
+
+    Returns:
+        None. Retorna un mensaje JSON indicando el resultado de la operación.
+    """
+    try:
+        # print(request.args)
+        # print(request.json)
+        database_flujo_plata: FlujoPlata = FlujoPlata()
+
+        flujo_plata_props_body: dict = {
+            "icon": request.json["icon"],
+            "Nombre": request.json["name"],
+            "Monto": request.json["monto"],
+            "I/O": request.json["i_o"],
+            "Fecha": request.json["fecha"],
+            "Cuenta": request.json["cuenta"],
+            "Gasto. Mes Año": request.json.get("gasto_mes", ""),
+            "Ingreso. Mes Año": request.json.get("ingreso_mes", ""),
+            "Tipo": request.json["tipo"]
+        }
+        database_flujo_plata.create_page(props_modified=flujo_plata_props_body)
+        return jsonify({'message': "Nuevo movimiento agregado."})
+    except Exception as ex:
+        return jsonify({'message': f"Error al el movimiento: \n {ex}"})
 
 def error_not_found(error):
     """Para gestionar casos de error"""
