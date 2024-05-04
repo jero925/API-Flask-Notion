@@ -7,7 +7,14 @@
 
 class FlujoPlata():
     """Corresponde a los datos de la DB Cuotas"""
-    def __init__(self, parent, name, total_price, dues_qty, date_first_due, buy_due, months) -> None:
+    def __init__(self,
+                 parent,
+                 name,
+                 total_price,
+                 dues_qty,
+                 date_first_due,
+                 buy_due,
+                 months) -> None:
         self.icon = "https://www.notion.so/icons/credit-card_gray.svg"
         self.parent = parent
         self.name = name
