@@ -28,7 +28,7 @@ class Database():
         self.database_id: str = database_id
         self.properties = {}
 
-    def query_database(self, database_id: str, filters: dict = None) -> dict:
+    def query_database(self, filters: dict = None) -> dict:
         """
         Consulta una base de datos en Notion.
 
@@ -40,7 +40,7 @@ class Database():
             list: Lista de registros que coinciden con la consulta.
         """
 
-        query_params: dict = {"database_id": database_id}
+        query_params: dict = {"database_id": self.database_id}
         if filters is not None:
             query_params["filter"] = filters
 
@@ -48,7 +48,8 @@ class Database():
         results: dict = response["results"]
         return results
 
-    def get_titles_rows_db(self, filters: dict = None) -> dict:
+    def get_titles_rows_db(self, filters: dict = None):
+        #ToDo -> Cambiar por retrieve
         """
         Recupera los nombres de los registros de una base de datos.
 
@@ -59,8 +60,11 @@ class Database():
         Returns:
             list: Lista de nombres de los registros que coinciden con la consulta.
         """
-        results: dict = self.query_database(self.database_id, filters)
+        print(f"database_id: {self.database_id}. Filtros: {filters}")
+        results = self.query_database(filters=filters)
+        # print(f"Esto es lo que da de resultados: {results}")
         title_name = self.get_database_title_property()
+        print(f"El title name de esto es: {title_name}")
         rows_titles = []
         for result in results:
             row_dict = {
@@ -124,7 +128,7 @@ class Database():
 
         return deleted_page_data
 
-    def create_page(self, database_id: str, props_page: dict, props_modified: dict) -> dict:
+    def create_page(self, props_page: dict, props_modified: dict) -> dict:
         """
         Crea una nueva página en una base de datos de Notion con propiedades modificadas.
 
@@ -173,7 +177,7 @@ class Database():
 
         # Construye las propiedades de la página, el padre y el ícono para crear la página
         page_properties: dict = props_page
-        page_parent: dict = {"database_id": database_id}
+        page_parent: dict = {"database_id": self.database_id}
         page_icon: dict = {"type": "external",
                            "external": {"url": props_modified["icon"]}}
         # Crea la página en Notion y devuelve la respuesta
@@ -185,7 +189,7 @@ class Database():
 
 
 class SpecificDatabase(Database):
-    """Instacia de subclase para una Database especifica"""
+    """Instancia de subclase para una Database especifica"""
     def __init__(self, database_id: str) -> None:
         self.icon: str = ""
         super().__init__(database_id)
@@ -200,17 +204,29 @@ class SpecificDatabase(Database):
         Returns:
             dict: Retorna un diccionario representando la página creada.
         """
-        props_modified["icon"] = self.icon
+        if self.icon:
+            props_modified["icon"] = self.icon
+        # print(props_modified)
         return super().create_page(
-            database_id=self.database_id,
             props_page=self.properties,
             props_modified=props_modified
         )
 
-    def query_specific_database(self, filters: dict = None) -> dict:
-        print(self.database_id)
-        print(filters)
-        return super().query_database(database_id=self.database_id,filters=filters)
+    def query_database(self, filters: dict = None) -> dict:
+        """
+        Consulta una base de datos en Notion.
+
+        Args:
+            filters (dict, opcional): Filtros aplicados a la consulta.
+
+        Returns:
+            dict: Lista de registros que coinciden con la consulta.
+        """
+        # Llama al método query_database de la clase padre con el ID de la base de datos
+        return super().query_database(filters=filters)
+
+    # def get_titles_rows_db(self, filters: dict = None):
+    #     return super().get_titles_rows_db(filters=filters)
 
 class FlujoPlata(Database):
     """
@@ -292,14 +308,43 @@ class FlujoPlata(Database):
             dict: Retorna un diccionario representando la página creada.
         """
         return super().create_page(
-            database_id=self.database_id,
             props_page=self.properties,
             props_modified=props_modified
         )
 
 def create_flujo_plata_page(database: Database):
     """Ejemplo de creacion de pagina en DB Flujo Plata"""
-    flujo_plata_props = {
+    flujo_plata_props_modified: dict = {
+        "icon": "https://www.notion.so/icons/credit-card_gray.svg",
+        "parent": "",
+        "Nombre": "Prueba flujo plata",
+        "Monto": 123456,
+        "I/O": "Gasto",
+        "Fecha": "2024-11-15",
+        "Cuenta": [],
+        "Gasto. Mes Año": ["d9c435da42a445b48ceaf181a5615380"],
+        "Tipo": ["Sueldo", "Suscripcion"]
+    }
+
+    # cuota_props_dict: dict = cuota_props_modified.to_dict
+    # print(cuota_props_modified)
+    database.create_page(
+        database_id=database.database_id,
+        props_page=database.properties,
+        props_modified=flujo_plata_props_modified
+    )
+
+
+def main() -> None:
+    """
+    Función principal para demostrar el uso de la clase Database.
+    """
+    database_id: str = os.getenv("FLUJOPLATA_DB_ID")
+    # database_id: str = os.getenv("CUOTAS_DB_ID")
+
+    # Crear una instancia de la clase Database
+    db: Database = Database(database_id=database_id)
+    db.properties = {
         "Fecha": {
             "type": "date",
             "date": {
@@ -359,40 +404,11 @@ def create_flujo_plata_page(database: Database):
             ]
         }
     }
-    flujo_plata_props_modified: dict = {
-        "icon": "https://www.notion.so/icons/credit-card_gray.svg",
-        "parent": "",
-        "Nombre": "Prueba flujo plata",
-        "Monto": 123456,
-        "I/O": "Gasto",
-        "Fecha": "2024-11-15",
-        "Cuenta": [],
-        "Gasto. Mes Año": ["d9c435da42a445b48ceaf181a5615380"],
-        "Tipo": ["Sueldo", "Suscripcion"]
-    }
-
-    # cuota_props_dict: dict = cuota_props_modified.to_dict
-    # print(cuota_props_modified)
-    database.create_page(
-        database_id=database.database_id,
-        props_page=flujo_plata_props,
-        props_modified=flujo_plata_props_modified
-    )
-
-
-def main() -> None:
-    """
-    Función principal para demostrar el uso de la clase Database.
-    """
-    # database_id: str = os.getenv("FLUJOPLATA_DB_ID")
-    database_id: str = os.getenv("CUOTAS_DB_ID")
-
-    # Crear una instancia de la clase Database
-    db: Database = Database(database_id=database_id)
     # query_database_results = db.query_database(filters=filtros)
     # print(query_database_results)
 
-    names_rows_results: dict = db.get_titles_rows_db()
+    filter = {"property": "Nombre", "rich_text": {"contains": "Helado"}}
+    names_rows_results: dict = db.get_titles_rows_db(filters=filter)
     print(names_rows_results)
 
     # create_cuota_page(database=db)
