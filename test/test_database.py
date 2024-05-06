@@ -22,13 +22,40 @@ def database_instance() -> Database:
 
     # Define las propiedades de ejemplo para la base de datos
     database.properties = {
-        "Monto Total": {"number": 1},
-        "Cantidad de cuotas": {"select": {"name": "6"}},
-        "Monto Regalado": {"number": 0},
-        "Primer cuota": {"date": {"start": "2024-02-13"}},
-        "Fecha de compra": {"date": {"start": "2024-03-13"}},
-        "Meses": {"type": "relation", "relation": []},
-        "Name": {"title": [{"text": {"content": "NombreDelRegistro"}}]}
+        "Monto Total": {
+            "number": 1
+        },
+        "Cantidad de cuotas": {
+            "select": {
+                "name": "6"
+            }
+        },
+        "Monto Regalado": {
+            "number": 0
+        },
+        "Primer cuota": {
+            "date": {
+                "start": "2024-02-13"
+            }
+        },
+        "Fecha de compra": {
+            "date": {
+                "start": "2024-03-13"
+            }
+        },
+        "Meses": {
+            "type": "relation",
+            "relation": []
+        },
+        "Name": {
+            "title": [
+                {
+                    "text": {
+                        "content": "NombreDelRegistro"
+                    }
+                }
+            ]
+        }
     }
 
     return database
