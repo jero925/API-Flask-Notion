@@ -103,13 +103,26 @@ class Database():
         Obtiene una pagina determinada mediante su ID
 
         Args:
-            page_id (str): Pagina y sus propiedades
+            page_id (str): Id de la Pagina
         """
         database_entries = self.get_titles_rows_db()
         if any(page_id in entry["id"] for entry in database_entries):
             page_result = notion.pages.retrieve(page_id=page_id)
 
         return page_result
+
+    def delete_page_by_id(self, page_id: str) -> dict:
+        """
+        Elimina una pagina determinada mediante su ID
+
+        Args:
+            page_id (str): Id de la Pagina 
+        """
+        database_entries = self.get_titles_rows_db()
+        if any(page_id in entry["id"] for entry in database_entries):
+            deleted_page_data = notion.blocks.delete(block_id=page_id)
+
+        return deleted_page_data
 
     def create_page(self, database_id: str, props_page: dict, props_modified: dict) -> dict:
         """
