@@ -37,7 +37,7 @@ class Database():
             filters (dict, opcional): Filtros aplicados a la consulta.
 
         Returns:
-            list: Lista de registros que coinciden con la consulta.
+            dict: Diccionario de registros que coinciden con la consulta.
         """
 
         query_params: dict = {"database_id": self.database_id}
@@ -48,8 +48,7 @@ class Database():
         results: dict = response["results"]
         return results
 
-    def get_titles_rows_db(self, filters: dict = None):
-        #ToDo -> Cambiar por retrieve
+    def get_titles_rows_db(self, filters: dict = None) -> list:
         """
         Recupera los nombres de los registros de una base de datos.
 
@@ -58,13 +57,13 @@ class Database():
             filters (dict, opcional): Filtros aplicados a la consulta.
 
         Returns:
-            list: Lista de nombres de los registros que coinciden con la consulta.
+            rows_titles: Lista de diccionarios con Id y Nombres de los registros de consulta.
         """
-        print(f"database_id: {self.database_id}. Filtros: {filters}")
+        # print(f"database_id: {self.database_id}. Filtros: {filters}")
         results = self.query_database(filters=filters)
         # print(f"Esto es lo que da de resultados: {results}")
         title_name = self.get_database_title_property()
-        print(f"El title name de esto es: {title_name}")
+        # print(f"El title name de esto es: {title_name}")
         rows_titles = []
         for result in results:
             row_dict = {
@@ -227,193 +226,3 @@ class SpecificDatabase(Database):
 
     # def get_titles_rows_db(self, filters: dict = None):
     #     return super().get_titles_rows_db(filters=filters)
-
-class FlujoPlata(Database):
-    """
-    Inicializa una instancia de Flujo de Plata.
-    """
-    def __init__(self) -> None:
-        self.database_id: str = os.getenv("FLUJOPLATA_DB_ID")
-        super().__init__(database_id=self.database_id)
-        self.icon: str = ""
-        self.properties: dict = {
-            "Fecha": {
-                "type": "date",
-                "date": {
-                        "start": "2024-01-04"
-                }
-            },
-            "Producto en cuotas": {
-                "type": "relation",
-                "relation": [],
-            },
-            "Cuenta": {
-                "type": "relation",
-                "relation": [],
-            },
-            "Tipo": {
-                "type": "multi_select",
-                "multi_select": []
-            },
-            "Suscripcion": {
-                "type": "relation",
-                "relation": [],
-            },
-            "I/O": {
-                "type": "select",
-                "select": {
-                        "name": "Gasto"
-                }
-            },
-            "Estado Suscripcion": {
-                "type": "status",
-                "status": {
-                        "name": "No sub"
-                }
-            },
-            "Ingreso. Mes Año": {
-                "type": "relation",
-                "relation": [],
-            },
-            "Monto": {
-                "type": "number",
-                "number": 1
-            },
-            "Gasto. Mes Año": {
-                "type": "relation",
-                "relation": [],
-            },
-            "Nombre": {
-                "id": "title",
-                "type": "title",
-                "title": [
-                        {
-                            "type": "text",
-                            "text": {
-                                "content": ""
-                            }
-                        }
-                ]
-            }
-        }
-
-    def create_page(self, props_modified: dict) -> dict:
-        """
-        Crea una nueva página en la base de datos Cuota con las propiedades modificadas.
-
-        Args:
-            props_modified (dict): Diccionario de propiedades modificadas.
-
-        Returns:
-            dict: Retorna un diccionario representando la página creada.
-        """
-        return super().create_page(
-            props_page=self.properties,
-            props_modified=props_modified
-        )
-
-def create_flujo_plata_page(database: Database):
-    """Ejemplo de creacion de pagina en DB Flujo Plata"""
-    flujo_plata_props_modified: dict = {
-        "icon": "https://www.notion.so/icons/credit-card_gray.svg",
-        "parent": "",
-        "Nombre": "Prueba flujo plata",
-        "Monto": 123456,
-        "I/O": "Gasto",
-        "Fecha": "2024-11-15",
-        "Cuenta": [],
-        "Gasto. Mes Año": ["d9c435da42a445b48ceaf181a5615380"],
-        "Tipo": ["Sueldo", "Suscripcion"]
-    }
-
-    # cuota_props_dict: dict = cuota_props_modified.to_dict
-    # print(cuota_props_modified)
-    database.create_page(
-        database_id=database.database_id,
-        props_page=database.properties,
-        props_modified=flujo_plata_props_modified
-    )
-
-
-def main() -> None:
-    """
-    Función principal para demostrar el uso de la clase Database.
-    """
-    database_id: str = os.getenv("FLUJOPLATA_DB_ID")
-    # database_id: str = os.getenv("CUOTAS_DB_ID")
-
-    # Crear una instancia de la clase Database
-    db: Database = Database(database_id=database_id)
-    db.properties = {
-        "Fecha": {
-            "type": "date",
-            "date": {
-                    "start": "2024-01-04"
-            }
-        },
-        "Producto en cuotas": {
-            "type": "relation",
-            "relation": [],
-        },
-        "Cuenta": {
-            "type": "relation",
-            "relation": [],
-        },
-        "Tipo": {
-            "type": "multi_select",
-            "multi_select": []
-        },
-        "Suscripcion": {
-            "type": "relation",
-            "relation": [],
-        },
-        "I/O": {
-            "type": "select",
-            "select": {
-                    "name": "Gasto"
-            }
-        },
-        "Estado Suscripcion": {
-            "type": "status",
-            "status": {
-                    "name": "No sub"
-            }
-        },
-        "Ingreso. Mes Año": {
-            "type": "relation",
-            "relation": [],
-        },
-        "Monto": {
-            "type": "number",
-            "number": 1
-        },
-        "Gasto. Mes Año": {
-            "type": "relation",
-            "relation": [],
-        },
-        "Nombre": {
-            "id": "title",
-            "type": "title",
-            "title": [
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": ""
-                        }
-                    }
-            ]
-        }
-    }
-    # query_database_results = db.query_database(filters=filtros)
-    # print(query_database_results)
-
-    filter = {"property": "Nombre", "rich_text": {"contains": "Helado"}}
-    names_rows_results: dict = db.get_titles_rows_db(filters=filter)
-    print(names_rows_results)
-
-    # create_cuota_page(database=db)
-    # create_flujo_plata_page(database=db)
-
-
-if __name__ == "__main__":
-    main()

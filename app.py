@@ -1,6 +1,6 @@
 """Rutas de mi aplicacion"""
 from flask import Flask, jsonify, request
-from src.models.database_model import FlujoPlata
+# from src.models.database_model import FlujoPlata
 from src.models.cuotas import Cuota
 from src.models.meses import Meses
 
@@ -92,34 +92,34 @@ def add_new_due_product() -> dict:
         return jsonify({'message': f"Error al registrar nueva cuota. \n {ex}"})
 
 
-@app.route('/movimiento', methods=["POST"])
-def add_new_transaction() -> None:
-    """
-    Agrega un nuevo producto en cuotas a la base de datos.
+# @app.route('/movimiento', methods=["POST"])
+# def add_new_transaction() -> None:
+#     """
+#     Agrega un nuevo producto en cuotas a la base de datos.
 
-    Returns:
-        None. Retorna un mensaje JSON indicando el resultado de la operación.
-    """
-    try:
-        # print(request.args)
-        # print(request.json)
-        database_flujo_plata: FlujoPlata = FlujoPlata()
+#     Returns:
+#         None. Retorna un mensaje JSON indicando el resultado de la operación.
+#     """
+#     try:
+#         # print(request.args)
+#         # print(request.json)
+#         database_flujo_plata: FlujoPlata = FlujoPlata()
 
-        flujo_plata_props_body: dict = {
-            "icon": request.json["icon"],
-            "Nombre": request.json["name"],
-            "Monto": request.json["monto"],
-            "I/O": request.json["i_o"],
-            "Fecha": request.json["fecha"],
-            "Cuenta": request.json["cuenta"],
-            "Gasto. Mes Año": request.json.get("gasto_mes", ""),
-            "Ingreso. Mes Año": request.json.get("ingreso_mes", ""),
-            "Tipo": request.json["tipo"]
-        }
-        database_flujo_plata.create_page(props_modified=flujo_plata_props_body)
-        return jsonify({'message': "Nuevo movimiento agregado."})
-    except Exception as ex:
-        return jsonify({'message': f"Error al el movimiento: \n {ex}"})
+#         flujo_plata_props_body: dict = {
+#             "icon": request.json["icon"],
+#             "Nombre": request.json["name"],
+#             "Monto": request.json["monto"],
+#             "I/O": request.json["i_o"],
+#             "Fecha": request.json["fecha"],
+#             "Cuenta": request.json["cuenta"],
+#             "Gasto. Mes Año": request.json.get("gasto_mes", ""),
+#             "Ingreso. Mes Año": request.json.get("ingreso_mes", ""),
+#             "Tipo": request.json["tipo"]
+#         }
+#         database_flujo_plata.create_page(props_modified=flujo_plata_props_body)
+#         return jsonify({'message': "Nuevo movimiento agregado."})
+#     except Exception as ex:
+#         return jsonify({'message': f"Error al el movimiento: \n {ex}"})
 
 def error_not_found(error):
     """Para gestionar casos de error"""

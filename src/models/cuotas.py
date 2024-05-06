@@ -72,24 +72,15 @@ def main() -> None:
     """
     cuota_database = Cuota()
 
-    filtros: dict = {
-        "and": [
-            {
-                "property": "Activa",
-                "checkbox": {
-                    "equals": True
-                }
-            }
-        ]
-    }
+    filtros: dict = {"property": "Activa","checkbox": {"equals": True}}
 
     create_cuota_page(cuota_database)
 
-    # query_database_results = db.query_database(filters=filtros)
-    # print(query_database_results)
+    query_database_results = cuota_database.query_database(filters=filtros)
+    print(query_database_results)
 
-    # names_rows_results: dict = db.get_titles_rows_db(filters=filtros)
-    # print(names_rows_results)
+    names_rows_results: dict = cuota_database.get_titles_rows_db()
+    print(names_rows_results)
 
 if __name__ == "__main__":
     main()

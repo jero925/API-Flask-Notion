@@ -123,7 +123,6 @@ def test_create_page(database_instance: Database):
 
     # Crea una nueva página
     new_page = database_instance.create_page(
-        database_id=database_instance.database_id,
         props_page=database_instance.properties,
         props_modified=modified_properties)
 
