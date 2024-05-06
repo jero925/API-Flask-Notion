@@ -9,7 +9,7 @@ class Cuota(SpecificDatabase):
     def __init__(self) -> None:
         self.database_id: str = os.getenv("CUOTAS_DB_ID")
         super().__init__(database_id=self.database_id)
-        self.icon: str = "https://www.notion.so/icons/credit-card_gray.svg"
+        self.icon: str = ""
         self.properties: dict = {
             "Monto Total": {
                 "number": 1
@@ -50,7 +50,7 @@ class Cuota(SpecificDatabase):
 def create_cuota_page(cuota: Cuota) -> None:
     """Ejemplo de creacion de pagina en DB Cuotas"""
     cuota_props_modified: dict = {
-        "icon": "https://www.notion.so/icons/credit-card_gray.svg",
+        "icon": "https://www.notion.so/icons/downward_red.svg",
         "parent": "",
         "Name": "Prueba ejecucion de cosas",
         "Monto Total": 999999,
