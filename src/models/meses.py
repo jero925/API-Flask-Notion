@@ -117,7 +117,7 @@ def main():
         ]
     }
 
-    meses_data = meses_database.query_specific_database(filters=filters)
+    meses_data = meses_database.query_database(filters=filters)
     print(meses_data)
 
 if __name__ == "__main__":
