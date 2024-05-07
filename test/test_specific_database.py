@@ -157,21 +157,21 @@ def test_create_page(specific_database_instance: SpecificDatabase):
     # Verifica que la página se haya creado correctamente
     assert new_page is not None
 
-# def test_delete_page(specific_database_instance: SpecificDatabase):
-#     """
-#     Prueba la función delete_page_by_id de la clase Database.
+def test_delete_page(specific_database_instance: SpecificDatabase):
+    """
+    Prueba la función delete_page_by_id de la clase Database.
 
-#     Args:
-#         specific_database_instance (Database): Instancia de Database para la prueba.
-#     """
-#     filters: dict = {"property": "Nombre", "rich_text": {"contains": "Testing Execution"}}
-#     # Busca una página creada para la prueba
-#     test_created_page: dict = specific_database_instance.get_titles_rows_db(filters=filters)
+    Args:
+        specific_database_instance (Database): Instancia de Database para la prueba.
+    """
+    filters: dict = {"property": "Nombre", "rich_text": {"contains": "Testing Execution"}}
+    # Busca una página creada para la prueba
+    test_created_page: dict = specific_database_instance.get_titles_rows_db(filters=filters)
 
-#     # Si se encontró una página, intenta eliminarla
-#     if test_created_page is not None:
-#         deleted_page_results = specific_database_instance.delete_page_by_id(
-#             test_created_page[0]["id"])
+    # Si se encontró una página, intenta eliminarla
+    if test_created_page is not None:
+        deleted_page_results = specific_database_instance.delete_page_by_id(
+            test_created_page[0]["id"])
 
-#     # Verifica que la página se haya eliminado correctamente
-#     assert deleted_page_results is not None
+    # Verifica que la página se haya eliminado correctamente
+    assert deleted_page_results is not None

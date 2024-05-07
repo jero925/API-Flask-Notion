@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 from src.models.flujo_plata import FlujoPlata
 from src.models.cuotas import Cuota
 from src.models.meses import Meses
+from src.models.payment_methods import MetodoPago
 
 app = Flask(__name__)
 
@@ -54,13 +55,38 @@ def get_cuota_by_id(id: str) -> dict:
 def get_mes_actual() -> dict:
     """Obtiene el mes actual"""
     try:
-        database_meses = Meses()
-        page_mes_actual: dict = database_meses.get_actual_month()
+        meses_database = Meses()
+        page_mes_actual: dict = meses_database.get_actual_month()
         if page_mes_actual is not None:
             return jsonify({'month': page_mes_actual, 'message': "Mes actual."})
     except Exception as ex:
         return jsonify({'message': f"Error: {ex}"})
 
+@app.route('/cuentas')
+def get_all_payment_methods() -> dict:
+    """Obtiene un listado de diccionarios con Id y Nombre de las cuentas"""
+    try:
+        cuentas_database = MetodoPago()
+        payment_methods_data: dict = cuentas_database.get_titles_rows_db()
+        if payment_methods_data is not None:
+             return jsonify({'payment_methods': payment_methods_data, 'message': "Cuentas obtenidas correctamente."})
+        else:
+            return jsonify({'message': "No se han encontrado datos."})
+    except Exception as ex:
+        return jsonify({'message': f"Error: {ex}"})
+
+@app.route('/cuentas/<id>')
+def get_payment_method(id: str) -> dict:
+    """Obtiene un listado de diccionarios con Id y Nombre de las cuentas"""
+    try:
+        cuentas_database = MetodoPago()
+        payment_methods_data: dict = cuentas_database.get_page_by_id(id)
+        if payment_methods_data is not None:
+             return jsonify({'payment_method': payment_methods_data, 'message': "Cuenta obtenidas correctamente."})
+        else:
+            return jsonify({'message': "No se han encontrado datos."})
+    except Exception as ex:
+        return jsonify({'message': f"Error: {ex}"})
 # POST
 
 @app.route('/cuota', methods=["POST"])
