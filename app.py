@@ -1,9 +1,11 @@
 """Rutas de mi aplicacion"""
 from flask import Flask, jsonify, request
 from src.models.flujo_plata import FlujoPlata
-from src.models.cuotas import Cuota
+# from src.models.cuotas import Cuota
 from src.models.meses import Meses
 from src.models.payment_methods import MetodoPago
+
+from src.routes.cuotas import cuotas
 
 app = Flask(__name__)
 
@@ -15,41 +17,43 @@ def index():
 
 # GET
 
+app.register_blueprint(cuotas)
+# @app.route('/cuotas')
+# def get_cuotas() -> dict:
+#     """Obtiene cuotas activas"""
+#     try:
+#         database_cuota: Cuota = Cuota()
+#         active_filter: dict = {
+#             "and": [
+#                 {
+#                     "property": "Activa",
+#                     "checkbox": {
+#                         "equals": True
+#                     }
+#                 }
+#             ]
+#         }
+#         active_dues: list = database_cuota.get_titles_rows_db(
+#             filters=active_filter)
+#         return jsonify({'month': active_dues, 'message': "Active Dues."})
+#     except Exception as ex:
+#         return jsonify({'message': f"Error: {ex}"})
 
-@app.route('/cuotas')
-def get_cuotas() -> dict:
-    """Obtiene cuotas activas"""
-    try:
-        database_cuota: Cuota = Cuota()
-        active_filter: dict = {
-            "and": [
-                {
-                    "property": "Activa",
-                    "checkbox": {
-                        "equals": True
-                    }
-                }
-            ]
-        }
-        active_dues: list = database_cuota.get_titles_rows_db(filters=active_filter)
-        return jsonify({'month': active_dues, 'message': "Active Dues."})
-    except Exception as ex:
-        return jsonify({'message': f"Error: {ex}"})
 
+# @app.route('/cuotas/<id>')
+# def get_cuota_by_id(id: str) -> dict:
+#     """Obtiene una cuota específica"""
+#     try:
+#         database_cuota: Cuota = Cuota()
 
-@app.route('/cuotas/<id>')
-def get_cuota_by_id(id: str) -> dict:
-    """Obtiene una cuota específica"""
-    try:
-        database_cuota: Cuota = Cuota()
+#         page_cuota_data = database_cuota.get_page_by_id(id)
+#         if page_cuota_data is not None:
+#             return jsonify({'due': page_cuota_data, 'message': "Cuota obtenida exitosamente."})
+#         else:
+#             return jsonify({'message': "Cuota no encontrada."})
+#     except Exception as ex:
+#         return jsonify({'message': f"Error: {ex}"})
 
-        page_cuota_data = database_cuota.get_page_by_id(id)
-        if page_cuota_data is not None:
-            return jsonify({'due': page_cuota_data, 'message': "Cuota obtenida exitosamente."})
-        else:
-            return jsonify({'message': "Cuota no encontrada."})
-    except Exception as ex:
-        return jsonify({'message': f"Error: {ex}"})
 
 @app.route('/meses')
 def get_mes_actual() -> dict:
@@ -62,6 +66,7 @@ def get_mes_actual() -> dict:
     except Exception as ex:
         return jsonify({'message': f"Error: {ex}"})
 
+
 @app.route('/cuentas')
 def get_all_payment_methods() -> dict:
     """Obtiene un listado de diccionarios con Id y Nombre de las cuentas"""
@@ -69,11 +74,12 @@ def get_all_payment_methods() -> dict:
         cuentas_database = MetodoPago()
         payment_methods_data: dict = cuentas_database.get_titles_rows_db()
         if payment_methods_data is not None:
-             return jsonify({'payment_methods': payment_methods_data, 'message': "Cuentas obtenidas correctamente."})
+            return jsonify({'payment_methods': payment_methods_data, 'message': "Cuentas obtenidas correctamente."})
         else:
             return jsonify({'message': "No se han encontrado datos."})
     except Exception as ex:
         return jsonify({'message': f"Error: {ex}"})
+
 
 @app.route('/cuentas/<id>')
 def get_payment_method(id: str) -> dict:
@@ -82,43 +88,44 @@ def get_payment_method(id: str) -> dict:
         cuentas_database = MetodoPago()
         payment_methods_data: dict = cuentas_database.get_page_by_id(id)
         if payment_methods_data is not None:
-             return jsonify({'payment_method': payment_methods_data, 'message': "Cuenta obtenidas correctamente."})
+            return jsonify({'payment_method': payment_methods_data, 'message': "Cuenta obtenidas correctamente."})
         else:
             return jsonify({'message': "No se han encontrado datos."})
     except Exception as ex:
         return jsonify({'message': f"Error: {ex}"})
 # POST
 
-@app.route('/cuota', methods=["POST"])
-def add_new_due_product() -> dict:
-    """
-    Agrega un nuevo producto en cuotas a la base de datos.
 
-    Returns:
-        None. Retorna un mensaje JSON indicando el resultado de la operación.
-    """
-    try:
-        # print(request.args)
-        # print(request.json)
-        database_cuota: Cuota = Cuota()
+# @app.route('/cuotas', methods=["POST"])
+# def add_new_due_product() -> dict:
+#     """
+#     Agrega un nuevo producto en cuotas a la base de datos.
 
-        cuota_props_body: dict = {
-            "icon": "",
-            "Name": request.json["name"],
-            "Monto Total": request.json["monto total"],
-            "Cantidad de cuotas": request.json["cantidad de cuotas"],
-            "Primer cuota": request.json["primer cuota"],
-            "Fecha de compra": request.json["fecha de compra"],
-            "Meses": request.json["meses"]
-        }
+#     Returns:
+#         None. Retorna un mensaje JSON indicando el resultado de la operación.
+#     """
+#     try:
+#         # print(request.args)
+#         # print(request.json)
+#         database_cuota: Cuota = Cuota()
 
-        database_cuota.create_page(props_modified=cuota_props_body)
-        return jsonify({'message': "Producto en cuotas agregado."})
-    except Exception as ex:
-        return jsonify({'message': f"Error al registrar nueva cuota. \n {ex}"})
+#         cuota_props_body: dict = {
+#             "icon": "",
+#             "Name": request.json["name"],
+#             "Monto Total": request.json["monto total"],
+#             "Cantidad de cuotas": request.json["cantidad de cuotas"],
+#             "Primer cuota": request.json["primer cuota"],
+#             "Fecha de compra": request.json["fecha de compra"],
+#             "Meses": request.json["meses"]
+#         }
+
+#         database_cuota.create_page(props_modified=cuota_props_body)
+#         return jsonify({'message': "Producto en cuotas agregado."})
+#     except Exception as ex:
+#         return jsonify({'message': f"Error al registrar nueva cuota. \n {ex}"})
 
 
-@app.route('/movimiento', methods=["POST"])
+@app.route('/movimientos', methods=["POST"])
 def add_new_transaction() -> None:
     """
     Agrega un nuevo producto en cuotas a la base de datos.
@@ -146,6 +153,7 @@ def add_new_transaction() -> None:
         return jsonify({'message': "Nuevo movimiento agregado."})
     except Exception as ex:
         return jsonify({'message': f"Error al el movimiento: \n {ex}"})
+
 
 def error_not_found(error):
     """Para gestionar casos de error"""

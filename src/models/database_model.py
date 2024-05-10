@@ -4,6 +4,8 @@
     En la padre, va a estar como metodos los comunes, get, create, etc.
     Los atributos icon, parent, name. El resto de atributos van a ser propios de cada class hija
 """
+
+# ToDo agregar limite de 50 resultados POR DEFECTO al hacer un query
 import os
 
 from notion_client import Client
@@ -189,6 +191,7 @@ class Database():
 
 class SpecificDatabase(Database):
     """Instancia de subclase para una Database especifica"""
+
     def __init__(self, database_id: str) -> None:
         self.icon: str = ""
         super().__init__(database_id)
