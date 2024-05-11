@@ -1,4 +1,4 @@
-
+"""Definición de rutas para lógica de cuotas"""
 from flask import Blueprint, jsonify, request
 from ..models.cuotas import Cuota
 
