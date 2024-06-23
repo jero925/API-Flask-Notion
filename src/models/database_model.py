@@ -175,18 +175,85 @@ class Database():
                             props_page[page_prop_value]["multi_select"].append(
                                 {"name": select_name}
                             )
+                    case "rich_text":
+                        props_page[page_prop_value]["rich_text"][0]["text"]["content"] = (
+                        modified_prop_value
+                        )
 
-        # Construye las propiedades de la página, el padre y el ícono para crear la página
+        # Construye las propiedades de la página y el padre para crear la página
         page_properties: dict = props_page
         page_parent: dict = {"database_id": self.database_id}
-        page_icon: dict = {"type": "external",
-                           "external": {"url": props_modified["icon"]}}
+
+        # Condicionalmente construye el icon si está en props_modified
+        page_icon: dict = None
+        if "icon" in props_modified:
+            page_icon = {"type": "external", "external": {"url": props_modified["icon"]}}
+
+        # Construye los parámetros para la creación de la página
+        create_params = {
+            "parent": page_parent,
+            "properties": page_properties
+        }
+
+        # Añade el icono si está disponible
+        if page_icon:
+            create_params["icon"] = page_icon
         # Crea la página en Notion y devuelve la respuesta
-        new_page = notion.pages.create(
-            parent=page_parent,
-            icon=page_icon,
-            properties=page_properties)
+        new_page = notion.pages.create(**create_params)
         return new_page
+
+    def to_json(self, page_data: dict) -> dict:
+        """
+        Extrae información específica de un JSON de página de Notion.
+
+        Args:
+            page_data (list): Lista que contiene un diccionario con los datos de la página de Notion.
+
+        Returns:
+            dict: Diccionario con el id de la página, el icono y las propiedades con sus contenidos.
+        """
+        if not page_data:
+            return {}
+
+        page = page_data[0]  # Accede al primer (y único) elemento de la lista
+
+        page_info = {
+            "id": page.get("id"),
+            "icon": page.get("icon")
+        }
+
+        properties = page.get("properties", {})
+        properties_info = {}
+
+        for prop_name, prop_data in properties.items():
+            prop_data_type = prop_data.get("type")
+
+            match prop_data_type:
+                case "title":
+                    if prop_data["title"]:
+                        properties_info[prop_name] = prop_data["title"][0]["text"]["content"]
+                case "number":
+                    properties_info[prop_name] = prop_data.get("number")
+                case "select":
+                    if prop_data.get("select"):
+                        properties_info[prop_name] = prop_data["select"].get("name")
+                case "date":
+                    if prop_data.get("date"):
+                        properties_info[prop_name] = prop_data["date"].get("start")
+                case "relation":
+                    if prop_data.get("relation"):
+                        properties_info[prop_name] = [relation.get("id") for relation in prop_data["relation"]]
+                case "multi_select":
+                    if prop_data.get("multi_select"):
+                        properties_info[prop_name] = [select_name.get("name") for select_name in prop_data["multi_select"]]
+                case "rich_text":
+                    if prop_data["rich_text"]:
+                        properties_info[prop_name] = prop_data["rich_text"][0]["text"]["content"]
+
+        # Combina el diccionario inicial con las propiedades
+        page_info.update(properties_info)
+
+        return page_info
 
 
 class SpecificDatabase(Database):
@@ -208,7 +275,6 @@ class SpecificDatabase(Database):
         """
         if self.icon:
             props_modified["icon"] = self.icon
-        # print(props_modified)
         return super().create_page(
             props_page=self.properties,
             props_modified=props_modified

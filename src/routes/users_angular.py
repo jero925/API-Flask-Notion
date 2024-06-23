@@ -34,7 +34,7 @@ def login() -> dict:
         users_database = UsuarioAngular()
 
         page_user_data = users_database.login(username=username, password=password)
-        if page_user_data is not None:
+        if page_user_data:
             return jsonify({
                 'exists': True,
                 'user': page_user_data,
@@ -53,7 +53,7 @@ def get_user(username: str) -> dict:
         users_database = UsuarioAngular()
 
         page_user_data = users_database.get_user(username)
-        if page_user_data is not None:
+        if page_user_data:
             return jsonify({'user': page_user_data, 'message': "Usuario obtenido correctamente."})
         else:
             return jsonify({'message': "Usuario no encontrada."})
@@ -73,12 +73,15 @@ def add_user() -> dict:
 
         users_props_body: dict = {
             "Usuario": request.json["user"],
+            "Email": request.json["email"],
+            "Nombre Completo": request.json["fullname"], 
             "Contraseña": request.json["password"]
         }
-
-        user_data: dict = users_database.create_page(props_modified=users_props_body)
-        if user_data is not None:
-            return jsonify({'new_user': user_data,
+        print(users_props_body)
+        new_user_data: dict = users_database.create_page(props_modified=users_props_body)
+        new_user_data_props = new_user_data["properties"]
+        if new_user_data:
+            return jsonify({'new_user': new_user_data,
                             'message': "Usuario creado correctamente."})
         else:
             return jsonify({'message': "Error al crear el usuario."})

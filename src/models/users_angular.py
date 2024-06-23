@@ -11,19 +11,51 @@ class UsuarioAngular(SpecificDatabase):
     def __init__(self) -> None:
         self.database_id: str = os.getenv("USUARIOS_DB_ID")
         super().__init__(database_id=self.database_id)
-        self.icon: str = ""
         self.properties: dict = {
-            "Contraseña": {
-                "id": "%7BOp%60",
-                "name": "Contraseña",
+            "Nombre Completo": {
                 "type": "rich_text",
-                "rich_text": {}
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "",
+                        }
+                    }
+                ]
+            },
+            "Email": {
+                "type": "rich_text",
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "",
+                        }
+                    }
+                ]
+            },
+            "Contraseña": {
+                "type": "rich_text",
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                        "content": ""
+                        }
+                    }
+                ]
             },
             "Usuario": {
                 "id": "title",
-                "name": "Usuario",
                 "type": "title",
-                "title": {}
+                "title": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": ""
+                        }
+                    }
+                ]
             }
         }
 
@@ -45,7 +77,8 @@ class UsuarioAngular(SpecificDatabase):
         }
 
         user_data = super().query_database(filters=filters)
-        return user_data
+        user_json = super().to_json(user_data)
+        return user_json
 
     def login(self, username: str, password: str) -> dict:
         """Obtiene el un usuario específico
