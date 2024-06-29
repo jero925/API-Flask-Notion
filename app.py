@@ -7,6 +7,7 @@ from src.routes.meses import meses
 from src.routes.cuentas import cuentas
 from src.routes.movimientos import movimientos
 from src.routes.users_angular import users
+from src.routes.books import books
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -22,6 +23,7 @@ app.register_blueprint(meses)
 app.register_blueprint(cuentas)
 app.register_blueprint(movimientos)
 app.register_blueprint(users)
+app.register_blueprint(books)
 
 def error_not_found(error):
     """Para gestionar casos de error"""
