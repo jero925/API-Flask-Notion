@@ -50,6 +50,46 @@ class Database():
         results: dict = response["results"]
         return results
 
+    def retrieve_database(self) -> dict:
+        """
+        Devuelve todos los datos de una db.
+
+        Args:
+            database_id (str): El ID de la base de datos.
+
+        Returns:
+            dict: Diccionario propiedades retrieve.
+        """
+        query_params: dict = {"database_id": self.database_id}
+
+        response: dict = notion.databases.retrieve(**query_params)
+        results: dict = response["properties"]
+        return results
+
+    def extract_select_properties_info(self) -> dict:
+        """
+        Devuelve las propiedades select y multi_select.
+
+        Args:
+            database_id (str): El ID de la base de datos.
+
+        Returns:
+            dict: Diccionario propiedades con sus valores.
+        """
+        properties_info = []
+
+        retrieved_data = self.retrieve_database()
+        for prop_name, prop_data in retrieved_data.items():
+            prop_data_type = prop_data["type"]
+            if prop_data_type in ("select", "multi_select"):
+                options = prop_data[prop_data_type]["options"]
+                property_info = {
+                    prop_name: [{"id": option["id"], "value": option["name"]} for option in options]
+                }
+                properties_info.append(property_info)
+
+        print(properties_info)
+        return properties_info
     def get_titles_rows_db(self, filters: dict = None) -> list:
         """
         Recupera los nombres de los registros de una base de datos.
