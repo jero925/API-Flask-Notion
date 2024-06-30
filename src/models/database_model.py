@@ -76,17 +76,14 @@ class Database():
         Returns:
             dict: Diccionario propiedades con sus valores.
         """
-        properties_info = []
+        properties_info = {}
 
         retrieved_data = self.retrieve_database()
         for prop_name, prop_data in retrieved_data.items():
             prop_data_type = prop_data["type"]
             if prop_data_type in ("select", "multi_select"):
                 options = prop_data[prop_data_type]["options"]
-                property_info = {
-                    prop_name: [{"id": option["id"], "value": option["name"]} for option in options]
-                }
-                properties_info.append(property_info)
+                properties_info[prop_name] = [{"id": option["id"], "value": option["name"]} for option in options]
 
         print(properties_info)
         return properties_info

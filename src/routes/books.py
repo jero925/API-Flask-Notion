@@ -53,7 +53,7 @@ def get_select_props() -> dict:
         select_properties = books_database.extract_select_properties_info()
         # books_data_json = books_database.to_json(select_properties)
         if select_properties:
-            return select_properties
+            return jsonify(select_properties)
         else:
             return jsonify({'message': "No se han encontrado libros."})
     except Exception as ex:
