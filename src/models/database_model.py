@@ -85,7 +85,6 @@ class Database():
                 options = prop_data[prop_data_type]["options"]
                 properties_info[prop_name] = [{"id": option["id"], "value": option["name"]} for option in options]
 
-        print(properties_info)
         return properties_info
     def get_titles_rows_db(self, filters: dict = None) -> list:
         """
@@ -265,7 +264,6 @@ class Database():
 
             for prop_name, prop_data in properties.items():
                 prop_data_type = prop_data.get("type")
-                # print(prop_data)
                 match prop_data_type:
                     case "title":
                         if prop_data["title"]:
@@ -274,7 +272,6 @@ class Database():
                         properties_info[prop_name] = prop_data.get("number")
                     case "select":
                         if prop_data.get("select"):
-                            print(prop_data["select"])
                             properties_info[prop_name] = {"id": prop_data["select"]["id"], "value": prop_data["select"]["name"]}
                     case "date":
                         if prop_data.get("date"):
