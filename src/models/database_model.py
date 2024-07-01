@@ -252,11 +252,11 @@ class Database():
         if not page_data:
             return {}
 
-        pages_info = []
+        pages_info = {}
 
         for page in page_data:
             page_info = {
-                "id": page.get("id"),
+                "page_id": page.get("id"),
                 "icon": page.get("icon")
             }
 
@@ -265,7 +265,7 @@ class Database():
 
             for prop_name, prop_data in properties.items():
                 prop_data_type = prop_data.get("type")
-
+                # print(prop_data)
                 match prop_data_type:
                     case "title":
                         if prop_data["title"]:
@@ -274,7 +274,8 @@ class Database():
                         properties_info[prop_name] = prop_data.get("number")
                     case "select":
                         if prop_data.get("select"):
-                            properties_info[prop_name] = prop_data["select"]["name"]
+                            print(prop_data["select"])
+                            properties_info[prop_name] = {"id": prop_data["select"]["id"], "value": prop_data["select"]["name"]}
                     case "date":
                         if prop_data.get("date"):
                             properties_info[prop_name] = prop_data["date"].get("start")
@@ -283,14 +284,14 @@ class Database():
                             properties_info[prop_name] = [relation.get("id") for relation in prop_data["relation"]]
                     case "multi_select":
                         if prop_data.get("multi_select"):
-                            properties_info[prop_name] = [select_name.get("name") for select_name in prop_data["multi_select"]]
+                            properties_info[prop_name] = [{"id": option["id"], "value": option["name"]} for option in prop_data["multi_select"]]
                     case "rich_text":
                         if prop_data["rich_text"]:
                             properties_info[prop_name] = prop_data["rich_text"][0]["text"]["content"]
 
             # Combina el diccionario inicial con las propiedades
             page_info.update(properties_info)
-            pages_info.append(page_info)
+            pages_info.update(page_info)
 
         return pages_info
 

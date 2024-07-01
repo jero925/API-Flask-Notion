@@ -38,7 +38,7 @@ def get_book_by_isbn13(isbn13: int) -> dict:
         books_data = books_database.query_database(filters=filters)
         books_data_json = books_database.to_json(books_data)
         if books_data_json:
-            return jsonify({'books': books_data_json})
+            return books_data_json
         else:
             return jsonify({'message': "No se han encontrado libros."})
     except Exception as ex:
