@@ -1,9 +1,10 @@
 """Definición de rutas para lógica de movimientos"""
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from ..models.books import Bookcase
 from ..models.genres import Genres
 
 books = Blueprint('books', __name__)
+
 
 @books.route('/books')
 def get_books() -> dict:
@@ -19,6 +20,7 @@ def get_books() -> dict:
             return jsonify({'message': "No se han encontrado libros."})
     except Exception as ex:
         return jsonify({'message': f"Error: {ex}"})
+
 
 @books.route('/books/<isbn13>')
 def get_book_by_isbn13(isbn13: int) -> dict:
@@ -45,6 +47,7 @@ def get_book_by_isbn13(isbn13: int) -> dict:
     except Exception as ex:
         return jsonify({'message': f"Error: {ex}"})
 
+
 @books.route('/books/retrieve')
 def get_select_props() -> dict:
     """Obtiene todos los libros de la DB"""
@@ -60,16 +63,42 @@ def get_select_props() -> dict:
     except Exception as ex:
         return jsonify({'message': f"Error: {ex}"})
 
+
 @books.route('/books/genres')
 def get_books_genre() -> dict:
     try:
         genres_database = Genres()
 
         select_properties = genres_database.get_titles_rows_db()
-        # books_data_json = books_database.to_json(select_properties)
         if select_properties:
             return jsonify(select_properties)
         else:
             return jsonify({'message': "No se han encontrado libros."})
     except Exception as ex:
         return jsonify({'message': f"Error: {ex}"})
+
+
+@books.route('/books', methods=["POST"])
+def create_book() -> dict:
+    try:
+        books_database = Bookcase()
+
+        book_props_body: dict = {
+            "icon": request.json["icon"],
+            "cover": request.json["cover"],
+            "parent": request.json["parent"],
+            "Name": request.json["name"],
+            "Author": request.json["author"],
+            "Total pags": request.json["pages"],
+            "Estado": request.json["status"],
+            "ISBN_13": request.json["isbn_13"],
+            "Año Leido": request.json["year"],
+            "Start and End": request.json["start_end"],
+            "Puntaje": request.json["score"],
+            "Genre": request.json["genre"]
+        }
+
+        books_database.create_page(props_modified=book_props_body)
+        return jsonify({'message': "Nuevo libro agregado."})
+    except Exception as ex:
+        return jsonify({'message': f"Error al crear nuevo libro: \n {ex}"}), 400

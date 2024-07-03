@@ -225,6 +225,9 @@ class Database():
         if "icon" in props_modified:
             page_icon = {"type": "external", "external": {"url": props_modified["icon"]}}
 
+        if "cover" in props_modified:
+            page_cover = {"type": "external", "external": {"url": props_modified["cover"]}}
+
         # Construye los parámetros para la creación de la página
         create_params = {
             "parent": page_parent,
@@ -234,6 +237,8 @@ class Database():
         # Añade el icono si está disponible
         if page_icon:
             create_params["icon"] = page_icon
+        if page_cover:
+            create_params["cover"] = page_cover
         # Crea la página en Notion y devuelve la respuesta
         new_page = notion.pages.create(**create_params)
         return new_page
@@ -312,6 +317,8 @@ class SpecificDatabase(Database):
         """
         if self.icon:
             props_modified["icon"] = self.icon
+
+        print(props_modified)
         return super().create_page(
             props_page=self.properties,
             props_modified=props_modified

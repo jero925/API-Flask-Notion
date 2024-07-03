@@ -15,26 +15,18 @@ class Bookcase(SpecificDatabase):
             "Author": {
                 "id": "%3AMeY",
                 "type": "multi_select",
-                "multi_select": [
-                    {
-                        "id": "",
-                        "name": "",
-                        "color": ""
-                    }
-                ]
+                "multi_select": []
             },
             "Total pags": {
                 "id": "%3B%3Am~",
                 "type": "number",
-                "number": 35
+                "number": 1
             },
             "Estado": {
                 "id": "%3FjJr",
                 "type": "select",
                 "select": {
-                    "id": "",
                     "name": "",
-                    "color": ""
                 }
             },
             "ISBN_10": {
@@ -44,7 +36,7 @@ class Bookcase(SpecificDatabase):
                     {
                         "type": "text",
                         "text": {
-                            "content": "10"
+                            "content": ""
                         }
                     }
                 ]
@@ -52,11 +44,7 @@ class Bookcase(SpecificDatabase):
             "Año Leido": {
                 "id": "AmtG",
                 "type": "relation",
-                "relation": [
-                    {
-                        "id": "f1d456cd-efcb-4ce1-a9cc-2ec1b5b3dc19"
-                    }
-                ],
+                "relation": [],
             },
             "Start and End": {
                 "id": "BPoT",
@@ -82,17 +70,13 @@ class Bookcase(SpecificDatabase):
                 "id": "%60p%3Eo",
                 "type": "select",
                 "select": {
-                    "name": ""
+                    "name": "Book"
                 }
             },
             "Genre": {
                 "id": "fKM%5B",
                 "type": "relation",
-                "relation": [
-                    {
-                        "id": ""
-                    }
-                ]
+                "relation": []
             },
             "Leidas": {
                 "id": "hOrn",
@@ -171,3 +155,26 @@ class Bookcase(SpecificDatabase):
         book_data = super().query_database(filters=filters)
         book_json = super().to_json(book_data)
         return book_json
+
+def create_db_page(bookcase: Bookcase) -> None:
+    """Ejemplo de creacion de pagina en DB Cuotas"""
+    database_props_modified: dict = {
+        "cover": "http://books.google.com/books/content?id=hWSmEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api", 
+        "icon": "http://books.google.com/books/content?id=hWSmEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+        "parent": "",
+        "Name": "Pepito",
+        "Author": ["Brandon Sanderson"],
+        "Total pags": 320,
+        "Estado": "Reading",
+        "ISBN_13": "123123",
+        "Año Leido": ["f1d456cd-efcb-4ce1-a9cc-2ec1b5b3dc19"],
+        "Start and End": "2024-11-15",
+        "Puntaje": "⭐⭐⭐",
+        "Genre": ["36bb79c6-3b11-40ef-bf3f-c3f6a27568a0"],
+    }
+    # print(database_props_modified)
+    bookcase.create_page(props_modified=database_props_modified)
+
+if __name__ == "__main__":
+    bookcase_database = Bookcase()
+    create_db_page(bookcase_database)
