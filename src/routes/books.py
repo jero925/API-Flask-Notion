@@ -94,9 +94,12 @@ def create_book() -> dict:
             "ISBN_13": request.json["isbn_13"],
             "Año Leido": request.json["year"],
             "Start and End": request.json["start_end"],
-            "Puntaje": request.json["score"],
+            "Puntaje": request.json.get("score", ""),
             "Genre": request.json["genre"]
         }
+
+        if book_props_body["Puntaje"] == "":
+            del books_database.properties["Puntaje"]
 
         books_database.create_page(props_modified=book_props_body)
         return jsonify({'message': "Nuevo libro agregado."})
