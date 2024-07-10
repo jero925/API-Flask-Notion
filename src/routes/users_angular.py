@@ -1,7 +1,7 @@
 """Definición de rutas para lógica de movimientos"""
 from flask import Blueprint, jsonify, request
 from ..models.users_angular import UsuarioAngular
-
+from src.utils.security import Security
 users = Blueprint('users', __name__)
 
 # @users.route('/users')
@@ -25,26 +25,24 @@ users = Blueprint('users', __name__)
 #     except Exception as ex:
 #         return jsonify({'message': f"Error: {ex}"})
 
-@users.route('/login')
+@users.route('/login', methods=['POST'])
 def login() -> dict:
     """Valida si el usuario existe en DB"""
-    username = request.args.get('username')
-    password = request.args.get('password')
-    try:
-        users_database = UsuarioAngular()
+    username = request.json['username']
+    password = request.json['password']
+    users_database = UsuarioAngular()
 
-        page_user_data = users_database.login(username=username, password=password)
-        if page_user_data:
-            return jsonify({
-                'exists': True,
-                'user': page_user_data,
-                'message': "Usuario obtenido correctamente."
-                }
-            )
-        else:
-            return jsonify({'exists': False, 'message': "Usuario no encontrada."})
-    except Exception as ex:
-        return jsonify({'message': f"Error: {ex}"})
+    page_user_data = users_database.login(username=username, password=password)
+    if page_user_data:
+        encoded_token = Security.generate_token(page_user_data)
+        print('===ENCODED TOKEN=== ' + encoded_token)
+        return jsonify({
+            'exists': True,
+            'token': encoded_token
+            }
+        )
+    else:
+        return jsonify({'exists': False}), 401
 
 @users.route('/users/<username>')
 def get_user(username: str) -> dict:

@@ -2,6 +2,7 @@
 from flask import Blueprint, jsonify, request
 from ..models.books import Bookcase
 from ..models.genres import Genres
+from src.utils.security import Security
 
 books = Blueprint('books', __name__)
 
@@ -66,6 +67,12 @@ def get_select_props() -> dict:
 
 @books.route('/books/genres')
 def get_books_genre() -> dict:
+    has_access = Security.verify_token(request.headers)
+
+    if not has_access:
+        response = jsonify({'message': 'Unauthorized'})
+        return response, 401
+
     try:
         genres_database = Genres()
 
