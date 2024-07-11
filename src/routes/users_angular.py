@@ -35,7 +35,6 @@ def login() -> dict:
     page_user_data = users_database.login(username=username, password=password)
     if page_user_data:
         encoded_token = Security.generate_token(page_user_data)
-        print('===ENCODED TOKEN=== ' + encoded_token)
         return jsonify({
             'exists': True,
             'token': encoded_token
@@ -75,7 +74,6 @@ def add_user() -> dict:
             "Nombre Completo": request.json["fullname"], 
             "Contraseña": request.json["password"]
         }
-        print(users_props_body)
         new_user_data: dict = users_database.create_page(props_modified=users_props_body)
         new_user_data_props = new_user_data["properties"]
         if new_user_data:

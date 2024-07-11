@@ -9,11 +9,12 @@ class Security():
 
     @classmethod
     def generate_token(cls, authenticated_user):
+        user_properties = authenticated_user[0]["properties"]
         payload = {
             'iat': datetime.datetime.now(tz=cls.tz),
-            'exp': datetime.datetime.now(tz=cls.tz) + datetime.timedelta(minutes=10),
-            'username': authenticated_user[0]["properties"]["Usuario"]["title"][0]["text"]["content"]
-            # 'fullname': authenticated_user.fullname,
+            'exp': datetime.datetime.now(tz=cls.tz) + datetime.timedelta(minutes=30),
+            'username': user_properties["Usuario"]["title"][0]["text"]["content"],
+            'fullname': user_properties['Nombre Completo']['rich_text'][0]['text']['content']
             # 'roles': ['Administrator', 'Editor']
         }
         return jwt.encode(payload, cls.secret, algorithm="HS256")
