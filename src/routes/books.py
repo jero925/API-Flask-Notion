@@ -112,3 +112,24 @@ def create_book() -> dict:
         return jsonify({'message': "Nuevo libro agregado."})
     except Exception as ex:
         return jsonify({'message': f"Error al crear nuevo libro: \n {ex}"}), 400
+
+@books.route('/books/<page_id>', methods=["PATCH"])
+def update_book(page_id) -> dict:
+    try:
+        books_database = Bookcase()
+
+        book_props_body: dict = {
+            # "parent": request.json["parent"],
+            "Estado": request.json["status"],
+            "Start and End": request.json["start_end"],
+            "Puntaje": request.json.get("score", ""),
+            "Genre": request.json["genre"]
+        }
+
+        if book_props_body["Puntaje"] == "":
+            del books_database.properties["Puntaje"]
+
+        books_database.update_page(page_id=page_id, props_modified=book_props_body)
+        return jsonify({'message': "Libro actualizado."})
+    except Exception as ex:
+        return jsonify({'message': f"Error al actualizar el libro: {ex}"}), 400

@@ -243,6 +243,53 @@ class Database():
         new_page = notion.pages.create(**create_params)
         return new_page
 
+    def update_page(self, page_id: str, props_page: dict, props_modified: dict) -> dict:
+        # Elimina las propiedades de props_page si los valores de props_modified están vacíos
+        for modified_prop_key, modified_prop_value in list(props_modified.items()):
+            if modified_prop_value == '':
+                if modified_prop_key in props_page:
+                    del props_page[modified_prop_key]
+
+        # Crea un diccionario actualizado con las modificaciones aplicadas
+        updated_props_page = {}
+        for modified_prop_key, modified_prop_value in props_modified.items():
+            print(f"Procesando {modified_prop_key} con valor: {modified_prop_value}")
+            
+            if modified_prop_key in props_page.keys():
+                prop_data_type = self.get_property_data_type(props_page, modified_prop_key)
+                print(f"Tipo de dato de {modified_prop_key}: {prop_data_type}")
+
+                # Inicializa la propiedad en updated_props_page si no existe
+                if modified_prop_key not in updated_props_page:
+                    updated_props_page[modified_prop_key] = {}
+
+                # Actualiza las propiedades según el tipo de datos
+                match prop_data_type:
+                    case "title":
+                        updated_props_page[modified_prop_key]["title"] = [{"type": "text","text": {"content": modified_prop_value}}]
+                    case "number":
+                        updated_props_page[modified_prop_key]["number"] = modified_prop_value
+                    case "select":
+                        updated_props_page[modified_prop_key]["select"] = {"name": modified_prop_value}
+                    case "date":
+                        updated_props_page[modified_prop_key]["date"] = {"start": modified_prop_value}
+                    case "relation":
+                        updated_props_page[modified_prop_key]["relation"] = [{"id": relation} for relation in modified_prop_value]
+                    case "multi_select":
+                        updated_props_page[modified_prop_key]["multi_select"] = [{"name": select_name} for select_name in modified_prop_value]
+                    case "rich_text":
+                        updated_props_page[modified_prop_key]["rich_text"] = [{"type": "text","text": {"content": modified_prop_value}}]
+
+        # Construye los parámetros para la actualización de la página
+        update_params = {
+            "properties": updated_props_page
+        }
+
+        # Actualiza la página en Notion y devuelve la respuesta
+        updated_page = notion.pages.update(page_id, **update_params)
+        return updated_page
+
+
     def to_json(self, page_data: dict) -> dict:
         """
         Extrae información específica de un JSON de página de Notion.
@@ -320,6 +367,26 @@ class SpecificDatabase(Database):
 
         print(props_modified)
         return super().create_page(
+            props_page=self.properties,
+            props_modified=props_modified
+        )
+
+    def update_page(self, page_id:str, props_modified: dict) -> dict:
+        """
+        Crea una nueva página en la base de datos Cuota con las propiedades modificadas.
+
+        Args:
+            props_modified (dict): Diccionario de propiedades modificadas.
+
+        Returns:
+            dict: Retorna un diccionario representando la página creada.
+        """
+        if self.icon:
+            props_modified["icon"] = self.icon
+
+        print(props_modified)
+        return super().update_page(
+            page_id=page_id,
             props_page=self.properties,
             props_modified=props_modified
         )
