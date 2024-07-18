@@ -290,6 +290,13 @@ class Database():
         return updated_page
 
 
+    def delete_page(self, page_id: str):
+        delete_param = {
+            "archived": True
+        }
+        deleted_page = notion.pages.update(page_id=page_id, **delete_param)
+        return deleted_page
+
     def to_json(self, page_data: dict) -> dict:
         """
         Extrae información específica de un JSON de página de Notion.

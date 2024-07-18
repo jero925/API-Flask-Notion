@@ -133,3 +133,13 @@ def update_book(page_id) -> dict:
         return jsonify({'message': "Libro actualizado."})
     except Exception as ex:
         return jsonify({'message': f"Error al actualizar el libro: {ex}"}), 400
+
+@books.route('/books/<page_id>', methods=["DELETE"])
+def delete_book(page_id) -> dict:
+    try:
+        books_database = Bookcase()
+
+        books_database.delete_page(page_id=page_id)
+        return jsonify({'message': "Libro eliminado correctamente."})
+    except Exception as ex:
+        return jsonify({'message': f"Error al eliminar el libro: {ex}"}), 400
