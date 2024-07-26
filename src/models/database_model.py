@@ -225,6 +225,7 @@ class Database():
         if "icon" in props_modified:
             page_icon = {"type": "external", "external": {"url": props_modified["icon"]}}
 
+        page_cover: dict = None
         if "cover" in props_modified:
             page_cover = {"type": "external", "external": {"url": props_modified["cover"]}}
 
